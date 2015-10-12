@@ -12,7 +12,7 @@ import (
 var (
     targetExcel string = "./sitelist.xlsx"
     outputJSON  string = "./meta.json"
-    sheetName string = "sitedata"
+    sheetName   string = "sitedata"
 )
 
 
@@ -31,14 +31,25 @@ type pageData struct {
 
 func main() {
 
+
+    start := time.Now();
+
+
     // エクセルファイルをmapに変換する
-    getExcelSheet(sheetName)
+    sitedata := getExcelSheet(sheetName)
+
+
+    // JSON書き出し
+    writeJSON(sitedata)
+
+    // 経過時間出力
+    end := time.Now();
+    fmt.Printf("%f秒\n",(end.Sub(start)).Seconds())
+
 }
 
 // エクセルファイルをmapに変換する
-func getExcelSheet( aSheetName string ) {
-
-    start := time.Now();
+func getExcelSheet( aSheetName string ) []pageData {
 
     // sliceの宣言
     sitedata := make([]pageData, 0)
@@ -102,20 +113,21 @@ func getExcelSheet( aSheetName string ) {
 
             }
 
-            // TODO データの書き出しは別関数で実装
-            output, _ := json.Marshal(sitedata)
-
-
-            content := []byte(output)
-            ioutil.WriteFile(outputJSON, content, os.ModePerm)
-
-
             break
         }
 
     }
 
-    end := time.Now();
-    fmt.Printf("%f秒\n",(end.Sub(start)).Seconds())
+    return sitedata
+}
+
+// JSON書き出し
+func writeJSON( aSitedata []pageData ) {
+
+    output, _ := json.Marshal(aSitedata)
+
+
+    content := []byte(output)
+    ioutil.WriteFile(outputJSON, content, os.ModePerm)
 
 }
